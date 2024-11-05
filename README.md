@@ -1,0 +1,1 @@
+Don't wanna make you're own keysystem? Then this is for you! Try KeySystemZ! an unobfuscated script thats 100% safe and nice. You can even edit it your own! Just give credits. KeyRBLX, keyguardian is better but this is for people that are lazy to make their own keysystem gui! Adios! --// Put anything u desire to the script. \\--
