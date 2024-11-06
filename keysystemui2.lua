@@ -18,6 +18,7 @@ local function CreateRoundedFrame(properties, cornerRadius, children)
 	return Create("Frame", properties, {
 		Create("UICorner", { CornerRadius = UDim.new(0, cornerRadius) }),
 		unpack(children or {}),
+		Create("UIPadding", { PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10) }),
 	})
 end
 
@@ -35,13 +36,12 @@ local keyUi = CreateRoundedFrame({
 	}),
 })
 
--- Make the UI draggable
 --// set keyUi.Draggable to false if you dont want dragging.
 keyUi.Active = true
 keyUi.Draggable = true
 
 Create("TextLabel", {
-	Text = "Your Title Here", -- Your script title here.
+	Text = "Your Title Here",
 	Font = Enum.Font.GothamBold,
 	TextColor3 = Color3.fromRGB(255, 255, 255),
 	TextSize = 18,
@@ -52,7 +52,7 @@ Create("TextLabel", {
 })
 
 Create("TextLabel", {
-	Text = "Your Label Here", -- Very nice label for info.
+	Text = "Your Label Here",
 	Font = Enum.Font.Gotham,
 	TextColor3 = Color3.fromRGB(178, 178, 178),
 	TextSize = 14,
@@ -81,9 +81,10 @@ local keyInput = Create("TextBox", {
 		Color = Color3.fromRGB(0, 150, 100),
 		Thickness = 2,
 	}),
+	Create("UIPadding", { PaddingLeft = UDim.new(0, 5), PaddingRight = UDim.new(0, 5) }),
 })
 
-local function GetKey() --// use dc or any external web or app for this.
+local function GetKey()
 	setclipboard("put ur url")
 	print("Key URL copied to clipboard.")
 end
@@ -99,7 +100,7 @@ local function Continue()
 	local userInput = keyInput.Text
 	if userInput == correctKey then
 		blurEffect:Destroy()
-		keyUi:TweenPosition(UDim2.new(0.5, 0, 0, -400), "Out", "Quad", 0.5, true)
+		keyUi:TweenPosition(UDim2.new(0.5, 0, 0, -400), Enum.EasingDirection.Out, Enum.EasingStyle.Quint, 0.5, true)
 		wait(0.5)
 		keyUi:Destroy()
 		ExecuteScript()
@@ -115,7 +116,7 @@ local function Continue()
 			Parent = keyUi,
 		})
 		notifyLabel.TextTransparency = 0
-		notifyLabel:TweenPosition(UDim2.new(0.5, -150, 0.65, 0), "Out", "Quad", 0.5, true)
+		notifyLabel:TweenPosition(UDim2.new(0.5, -150, 0.65, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quint, 0.5, true)
 		for i = 0, 1, 0.1 do
 			wait(0.05)
 			notifyLabel.TextTransparency = i
@@ -151,6 +152,14 @@ local function CreateStyledButton(text, position, onClick)
 
 	textButton.MouseButton1Click:Connect(onClick)
 	button.Parent = keyUi
+
+	button.MouseEnter:Connect(function()
+		button:TweenSize(UDim2.new(0, 130, 0, 35), Enum.EasingDirection.Out, Enum.EasingStyle.Quint, 0.3, true)
+	end)
+
+	button.MouseLeave:Connect(function()
+		button:TweenSize(UDim2.new(0, 120, 0, 30), Enum.EasingDirection.Out, Enum.EasingStyle.Quint, 0.3, true)
+	end)
 end
 
 CreateStyledButton("Get Key", UDim2.new(0.5, -130, 0.5, 0), GetKey)
@@ -169,7 +178,7 @@ local closeButton = Create("TextButton", {
 
 closeButton.MouseButton1Click:Connect(function()
 	blurEffect:Destroy()
-	keyUi:TweenPosition(UDim2.new(0.5, 0, 0, -400), "Out", "Quad", 0.5, true)
+	keyUi:TweenPosition(UDim2.new(0.5, 0, 0, -400), Enum.EasingDirection.Out, Enum.EasingStyle.Quint, 0.5, true)
 	wait(0.5)
 	keyUi:Destroy()
 end)
@@ -180,3 +189,49 @@ Create("UIStroke", {
 	Thickness = 2,
 	Parent = closeButton
 })
+
+local minimizeButton = Create("TextButton", {
+    Text = "-",
+    Font = Enum.Font.GothamBold,
+    TextColor3 = Color3.fromRGB(0, 150, 100),
+    TextSize = 20,
+    BackgroundTransparency = 1,
+    Position = UDim2.new(0.85, 0, 0.05, 0),
+    Size = UDim2.new(0, 30, 0, 30),
+    Parent = keyUi,
+})
+
+local isMinimized = false
+minimizeButton.MouseButton1Click:Connect(function()
+    if not isMinimized then
+        keyUi:FindFirstChild("TextBox").Visible = false
+        keyUi:FindFirstChild("TextLabel").Visible = false
+        keyUi:FindFirstChild("TextButton").Visible = false
+        
+        blurEffect.Size = 0
+        keyUi:TweenSize(UDim2.new(0, 200, 0, 30), Enum.EasingDirection.Out, Enum.EasingStyle.Quint, 0.5, true)
+        
+        isMinimized = true
+    else
+        
+        keyUi:FindFirstChild("TextBox").Visible = true
+        keyUi:FindFirstChild("TextLabel").Visible = true
+        keyUi:FindFirstChild("TextButton").Visible = true
+        blurEffect.Size = 25
+        keyUi:TweenSize(UDim2.new(0, 460, 0, 320), Enum.EasingDirection.Out, Enum.EasingStyle.Quint, 0.5, true)
+        
+        isMinimized = false
+    end
+end)
+
+local function CloseUI()
+	blurEffect:Destroy()
+	keyUi:TweenPosition(UDim2.new(0.5, 0, 0, -400), Enum.EasingDirection.Out, Enum.EasingStyle.Quint, 0.5, true)
+	wait(0.5)
+	keyUi:Destroy()
+	game:GetService("StarterGui"):SetCore("SendNotification", {
+		Title = "Goodbye",
+		Text = "The UI has been closed.",
+		Duration = 2,
+	})
+end
